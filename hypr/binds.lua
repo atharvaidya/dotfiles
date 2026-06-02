@@ -1,6 +1,6 @@
 mainMod = "SUPER"
 terminal = "kitty"
-fileManager = "yazi"
+fileManager = "dolphin"
 menu = "rofi -show run"
 
 
@@ -62,3 +62,7 @@ hl.gesture({
     direction = "horizontal",
     action = "workspace"
 })
+
+
+hl.bind("Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | swappy -f -'))
+hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd('grim -g "$(slurp -d)" - | wl-copy'))
