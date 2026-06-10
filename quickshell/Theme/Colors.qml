@@ -18,4 +18,12 @@ QtObject {
     readonly property color success: "#a6e3a1"
     readonly property color warning: "#f9e2af"
     readonly property color danger: "#f38ba8"
+
+    // Glassmorphism / translucency helper colors
+    readonly property color bgGlass: "#cc11111b"
+    readonly property color surfaceGlass: "#ee1e1e2e"
+    readonly property color borderGlass: "#1cffffff"
+    readonly property color borderGlassMuted: "#0dffffff"
+    readonly property color hoverBg: "#22ffffff"
+    readonly property color hoverBgActive: "#3cffffff"
 }
