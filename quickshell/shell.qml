@@ -1,7 +1,6 @@
 import Quickshell
-import QtQuick
+import "./Bar"
 
 ShellRoot {
-    Clock{}
-    Taskbar{}
+    Bar{}
 }

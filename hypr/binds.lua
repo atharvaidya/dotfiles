@@ -17,12 +17,14 @@ hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + V", function()
     hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
     hl.dispatch(hl.dsp.window.pin())
-    hl.dispatch(hl.dsp.window.resize({ x = 500, y = 300 }))
+    hl.dispatch(hl.dsp.window.resize({ x = 600, y = 400 }))
 end)
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("firefox"))
+hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("code"))
+
 
 
 hl.bind(mainMod .. " + left", hl.dsp.focus({direction = "left"}))
