@@ -11,7 +11,10 @@ Item {
 
     required property var panelWindow
 
-    property bool open: false
+    readonly property bool isCurrent: panelWindow.activePopup === "wifi"
+    readonly property bool anotherPopupActive: panelWindow.activePopup !== "" && panelWindow.activePopup !== "wifi"
+    readonly property bool open: isCurrent
+
     property bool wifiEnabled: false
     property string connectedSsid: ""
     property int signalStrength: 0
@@ -26,7 +29,9 @@ Item {
     function updateState() {
         if (hoveringTrigger || hoveringPopup) {
             debounceTimer.stop();
-            if (!open) root.open = true;
+            if (panelWindow.activePopup !== "wifi") {
+                panelWindow.activePopup = "wifi";
+            }
         } else {
             debounceTimer.restart();
         }
@@ -37,8 +42,8 @@ Item {
         interval: 350
         repeat: false
         onTriggered: {
-            if (!hoveringTrigger && !hoveringPopup) {
-                root.open = false;
+            if (!hoveringTrigger && !hoveringPopup && panelWindow.activePopup === "wifi") {
+                panelWindow.activePopup = "";
                 animKeepAliveTimer.start();
             }
         }
@@ -62,11 +67,6 @@ Item {
         return "󰤯"
     }
 
-    function getWifiColor(enabled, ssid) {
-        if (!enabled) return Colors.textMuted
-        return ssid ? Colors.primary : Colors.text
-    }
-
     // ── Trigger button ──────────────────────────────────────────────────────
     Rectangle {
         id: trigger
@@ -80,21 +80,27 @@ Item {
         Text {
             anchors.centerIn: parent
             text: root.getWifiIcon(root.wifiEnabled, root.connectedSsid, root.signalStrength)
-            color: root.getWifiColor(root.wifiEnabled, root.connectedSsid)
+            color: root.wifiEnabled && root.connectedSsid ? Colors.primary : Colors.text
             font.pixelSize: 18
             Behavior on color { ColorAnimation { duration: 150 } }
         }
 
         MouseArea {
             anchors.fill: parent
-            onClicked: root.open = !root.open
+            onClicked: {
+                if (panelWindow.activePopup === "wifi") {
+                    panelWindow.activePopup = "";
+                } else {
+                    panelWindow.activePopup = "wifi";
+                }
+            }
         }
     }
 
     // ── Popup Window ────────────────────────────────────────────────────────
     PopupWindow {
         id: popup
-        visible: root.open || animKeepAliveTimer.running
+        visible: isCurrent || (animKeepAliveTimer.running && !anotherPopupActive)
         color: "transparent"
 
         anchor {
@@ -125,11 +131,21 @@ Item {
                 width: 230
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                x: 16 + (root.open ? 0 : -16)
-                opacity: root.open ? 1.0 : 0.0
+                x: 16 + (isCurrent ? 0 : -24)
+                opacity: isCurrent ? 1.0 : 0.0
 
-                Behavior on x { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
-                Behavior on opacity { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
+                Behavior on x {
+                    NumberAnimation {
+                        duration: 350
+                        easing.bezierCurve: [0.16, 1.0, 0.3, 1.0, 1.0, 1.0]
+                    }
+                }
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 350
+                        easing.bezierCurve: [0.16, 1.0, 0.3, 1.0, 1.0, 1.0]
+                    }
+                }
 
                 color: Colors.bgGlass
                 radius: 14

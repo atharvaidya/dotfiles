@@ -11,7 +11,10 @@ Item {
 
     required property var panelWindow
 
-    property bool open: false
+    readonly property bool isCurrent: panelWindow.activePopup === "powerprofile"
+    readonly property bool anotherPopupActive: panelWindow.activePopup !== "" && panelWindow.activePopup !== "powerprofile"
+    readonly property bool open: isCurrent
+
     readonly property bool hoveringTrigger: triggerHover.hovered
     readonly property bool hoveringPopup: popupHover.hovered
 
@@ -21,7 +24,9 @@ Item {
     function updateState() {
         if (hoveringTrigger || hoveringPopup) {
             debounceTimer.stop();
-            if (!open) root.open = true;
+            if (panelWindow.activePopup !== "powerprofile") {
+                panelWindow.activePopup = "powerprofile";
+            }
         } else {
             debounceTimer.restart();
         }
@@ -32,8 +37,8 @@ Item {
         interval: 350
         repeat: false
         onTriggered: {
-            if (!hoveringTrigger && !hoveringPopup) {
-                root.open = false;
+            if (!hoveringTrigger && !hoveringPopup && panelWindow.activePopup === "powerprofile") {
+                panelWindow.activePopup = "";
                 animKeepAliveTimer.start();
             }
         }
@@ -72,14 +77,20 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: root.open = !root.open
+            onClicked: {
+                if (panelWindow.activePopup === "powerprofile") {
+                    panelWindow.activePopup = "";
+                } else {
+                    panelWindow.activePopup = "powerprofile";
+                }
+            }
         }
     }
 
     // ── Popup Window ────────────────────────────────────────────────────────
     PopupWindow {
         id: popup
-        visible: root.open || animKeepAliveTimer.running
+        visible: isCurrent || (animKeepAliveTimer.running && !anotherPopupActive)
         color: "transparent"
 
         anchor {
@@ -110,11 +121,21 @@ Item {
                 width: 72
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                x: 16 + (root.open ? 0 : -16)
-                opacity: root.open ? 1.0 : 0.0
+                x: 16 + (isCurrent ? 0 : -24)
+                opacity: isCurrent ? 1.0 : 0.0
 
-                Behavior on x { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
-                Behavior on opacity { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
+                Behavior on x {
+                    NumberAnimation {
+                        duration: 350
+                        easing.bezierCurve: [0.16, 1.0, 0.3, 1.0, 1.0, 1.0]
+                    }
+                }
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 350
+                        easing.bezierCurve: [0.16, 1.0, 0.3, 1.0, 1.0, 1.0]
+                    }
+                }
 
                 color: Colors.bgGlass
                 radius: 14
@@ -170,7 +191,7 @@ Item {
             hoverEnabled: true
             onClicked: {
                 PowerProfiles.profile = profile;
-                root.open = false;
+                panelWindow.activePopup = "";
             }
         }
     }

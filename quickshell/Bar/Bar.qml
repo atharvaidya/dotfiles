@@ -6,6 +6,8 @@ import "../Theme"
 PanelWindow {
     id: rootWindow
 
+    property string activePopup: ""
+
     anchors {
         left: true
         top: true
