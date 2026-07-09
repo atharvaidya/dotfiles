@@ -1,7 +1,7 @@
 mainMod = "SUPER"
 terminal = "kitty"
 fileManager = "dolphin"
-menu = "rofi -show run"
+menu = "rofi -show combi -combi-modes \"drun,run\""
 
 
 hl.config({input = {touchpad = {natural_scroll = true}}})
